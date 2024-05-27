@@ -26,11 +26,15 @@ We will use stock data from 2015 to 2022 for our model training. And subsequentl
 ### Model(s)
 
 We use a: 
+
 1) **Deep neural network**
 
 and perhaps compare the result with the following models:
+
 2) **Linear regression**
+
 3) **Time series**
+
 4) **Reinforcement learning**
 
 By experimenting with and refining these models, we aim to develop a robust predictive system that delivers accurate forecasts of stock returns and volatility. This will enable the construction of an optimal portfolio that balances potential returns against associated risks.
@@ -39,6 +43,9 @@ By experimenting with and refining these models, we aim to develop a robust pred
 ### Team members
 
 Anjali Sarawgi 
+
 Ali Najibpour Nashi
+
 Annas Namouchi
+
 John-Pierre Weideman
