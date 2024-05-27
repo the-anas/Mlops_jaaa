@@ -11,11 +11,11 @@ The primary objective of our project is to develop a predictive model that can f
 
 ### Framework and Integration
 
-We utilize the [PyTorch(https://pytorch.org/docs/stable/index.html)] framework for constructing our deep neural network for predictions.
+We utilize the [PyTorch](https://pytorch.org/docs/stable/index.html) framework for constructing our deep neural network for predictions.
 
 ### Data Collection and Initial Dataset
 
-We construct the dataset using the [yfinance(https://github.com/ranaroussi/yfinance)] python package which allows us to extract our stock data from Yahoo Finance. 
+We construct the dataset using the [yfinance](https://github.com/ranaroussi/yfinance) python package which allows us to extract our stock data from Yahoo Finance. 
 Initially, we collect historical stock market data for five companies. This data will include daily stock prices, trading volumes, and other relevant financial indicators over a multi-year period. 
 
 By preprocessing and analyzing this data, we will generate the necessary input features for our deep neural network.
