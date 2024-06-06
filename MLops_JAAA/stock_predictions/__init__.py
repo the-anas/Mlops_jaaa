@@ -1,0 +1,2 @@
+from stock_predictions.models.model import MyNeuralNet
+from stock_predictions.predict_model import predict
