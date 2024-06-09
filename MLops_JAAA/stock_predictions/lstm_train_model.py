@@ -2,10 +2,10 @@ import os
 import click
 import matplotlib.pyplot as plt
 import torch
-from models.model import StockPricePredictor
+from models.lstm_model import LSTMStockPricePredictor
 import pandas as pd
 # from data import corrupt_mnis
-from data.make_dataset import load_data
+from data.lstm_make_dataset import load_data
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
@@ -34,17 +34,23 @@ def train(lr, batch_size, epochs) -> None:
     print(f"{lr=}, {batch_size=}, {epochs=}")
 
     # Train loader
-    features_scaled, X_train, X_test, y_train, y_test = load_data()
+    features_scaled, _, X_train, X_test, y_train, y_test = load_data()
 
     train_dataset = TensorDataset(X_train, y_train)
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False)
 
     # Initialize the model, loss function, and optimizer
-    model = StockPricePredictor(input_dim=features_scaled.shape[1])
+    input_dim = features_scaled.shape[1]
+    hidden_dim = 64
+    num_layers = 2
+    output_dim = 1
+    model = LSTMStockPricePredictor(
+        input_dim, hidden_dim, num_layers, output_dim)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     statistics = {"train_loss": [], "train_accuracy": []}
+    # Training with loss tracking
     losses = []
     num_epochs = 50
     for epoch in range(num_epochs):
@@ -65,17 +71,17 @@ def train(lr, batch_size, epochs) -> None:
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_epoch_loss:.4f}')
 
     print("Training complete")
-    torch.save(model.state_dict(), "models/model.pth")
+    torch.save(model.state_dict(), "models/lstm_model.pth")
     print("Model saved")
     # plot the loss
     plt.figure(figsize=(10, 6))
     plt.plot(losses, label='Training Loss')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
-    plt.title("Training Loss")
+    plt.title("LSTM Training Loss")
     plt.legend()
     plt.grid(True)
-    plt.savefig("reports/figures/training_loss.png")
+    plt.savefig("reports/figures/lstm_training_loss.png")
     print("Loss plot saved")
 
 
