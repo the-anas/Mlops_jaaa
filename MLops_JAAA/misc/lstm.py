@@ -171,7 +171,7 @@ from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 
 # Load the dataset
-file_path = 'raw/AZN.csv'
+file_path = 'processed/AZN.csv'
 data = pd.read_csv(file_path)
 print("Shape before dropping NaN values:", data.shape)
 data.dropna(axis=1, inplace=True)
