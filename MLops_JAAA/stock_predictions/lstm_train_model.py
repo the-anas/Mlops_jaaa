@@ -1,59 +1,43 @@
 import os
-import click
 import matplotlib.pyplot as plt
 import torch
 from models.lstm_model import LSTMStockPricePredictor
 import pandas as pd
-# from data import corrupt_mnis
 from data.lstm_make_dataset import load_data
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 import torch.nn as nn
 import torch.optim as optim
+import wandb
 
+wandb.init(project='MLOPS_JAAA', entity='alinajibpour')
 
-DEVICE = torch.device("cuda" if torch.cuda.is_available(
-) else "mps" if torch.backends.mps.is_available() else "cpu")
-
-
-# print("Current directory:", os.getcwd())
-
-@click.group()
-def cli():
-    """Command line interface."""
-    pass
-
-
-@click.command()
-@click.option("--lr", default=1e-3, help="learning rate to use for training")
-@click.option("--batch_size", default=32, help="batch size to use for training")
-@click.option("--epochs", default=10, help="number of epochs to train for")
-def train(lr, batch_size, epochs) -> None:
+def train(lr=0.001, batch_size=32, epochs=10) -> None:
     print("Training day and night")
     print(f"{lr=}, {batch_size=}, {epochs=}")
 
-    # Train loader
+    # Load data
     features_scaled, _, X_train, X_test, y_train, y_test = load_data()
 
     train_dataset = TensorDataset(X_train, y_train)
-    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False)
 
     # Initialize the model, loss function, and optimizer
     input_dim = features_scaled.shape[1]
     hidden_dim = 64
     num_layers = 2
     output_dim = 1
-    model = LSTMStockPricePredictor(
-        input_dim, hidden_dim, num_layers, output_dim)
+    model = LSTMStockPricePredictor(input_dim, hidden_dim, num_layers, output_dim)
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=lr)
 
-    statistics = {"train_loss": [], "train_accuracy": []}
-    # Training with loss tracking
+    # Track hyperparameters
+    wandb.config.lr = lr
+    wandb.config.batch_size = batch_size
+    wandb.config.epochs = epochs
+
+    # Training loop with WandB logging
     losses = []
-    num_epochs = 50
-    for epoch in range(num_epochs):
+    for epoch in range(epochs):
         model.train()
         epoch_loss = 0
         for X_batch, y_batch in train_loader:
@@ -68,12 +52,17 @@ def train(lr, batch_size, epochs) -> None:
 
         avg_epoch_loss = epoch_loss / len(train_loader)
         losses.append(avg_epoch_loss)
-        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_epoch_loss:.4f}')
+
+        # Log training loss to WandB
+        wandb.log({"Training Loss": avg_epoch_loss})
+
+        print(f'Epoch [{epoch+1}/{epochs}], Loss: {avg_epoch_loss:.4f}')
 
     print("Training complete")
     torch.save(model.state_dict(), "models/lstm_model.pth")
     print("Model saved")
-    # plot the loss
+
+    # Plot and save the loss curve
     plt.figure(figsize=(10, 6))
     plt.plot(losses, label='Training Loss')
     plt.xlabel('Epoch')
@@ -87,3 +76,5 @@ def train(lr, batch_size, epochs) -> None:
 
 if __name__ == "__main__":
     train()
+
+
