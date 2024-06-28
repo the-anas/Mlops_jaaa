@@ -1,0 +1,38 @@
+name: "Run tests"
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Print working directory
+        run: pwd
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          # cache: "pip" # you need to check this once!
+      - uses: iterative/setup-dvc@v1
+      - name: Get data
+        run: dvc pull
+        env:
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements_tests.txt
+      - name: Run main.py
+        run: |
+          python main.py

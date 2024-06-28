@@ -16,6 +16,9 @@ import torch.optim as optim
 DEVICE = torch.device("cuda" if torch.cuda.is_available(
 ) else "mps" if torch.backends.mps.is_available() else "cpu")
 
+# Add these lines at the top of your script
+os.makedirs("models", exist_ok=True)
+os.makedirs("reports/figures", exist_ok=True)
 
 # print("Current directory:", os.getcwd())
 

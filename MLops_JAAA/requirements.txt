@@ -1,1 +1,7 @@
-torch >= 2.1.0
+click
+matplotlib
+numpy
+pandas
+scikit_learn
+torch
+yfinance
