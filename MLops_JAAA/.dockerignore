@@ -1,3 +1,5 @@
+# .dockerignore
+
 # Ignore everything
 *
 
@@ -5,4 +7,5 @@
 !requirements.txt
 !pyproject.toml
 !stock_predictions/
-!data/
+!.dvc/
+!data.dvc
