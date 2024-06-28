@@ -7,7 +7,7 @@ RUN apt update && \
 
 COPY requirements.txt requirements.txt
 COPY pyproject.toml pyproject.toml
-COPY mlops_project/ mlops_project/
+COPY stock_predictions/ stock_predictions/
 COPY data/ data/
 
 WORKDIR /
