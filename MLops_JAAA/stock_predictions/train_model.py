@@ -12,6 +12,44 @@ from torch.utils.data import DataLoader, TensorDataset
 import torch.nn as nn
 import torch.optim as optim
 
+import os
+import pandas as pd
+import torch
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+
+# Update these lines to match your bucket and file path
+BUCKET_NAME = 'mlops-bucket-jaaa'
+DATA_PATH = 'data/processed/'
+
+def load_data():
+    # List of files in your GCS bucket
+    files = ['AZN.csv']
+
+    # Read data from GCS
+    dfs = []
+    for file in files:
+        file_path = f'/gcs/{BUCKET_NAME}/{DATA_PATH}{file}'
+        df = pd.read_csv(file_path)
+        dfs.append(df)
+    
+    data = pd.concat(dfs)
+
+    # Assume 'features' and 'target' are columns in your CSV files
+    features = data.drop(columns=['target'])
+    target = data['target']
+
+    scaler = MinMaxScaler()
+    features_scaled = scaler.fit_transform(features)
+
+    X_train, X_test, y_train, y_test = train_test_split(features_scaled, target, test_size=0.2, random_state=42)
+    
+    X_train = torch.tensor(X_train, dtype=torch.float32)
+    X_test = torch.tensor(X_test, dtype=torch.float32)
+    y_train = torch.tensor(y_train.values, dtype=torch.float32).view(-1, 1)
+    y_test = torch.tensor(y_test.values, dtype=torch.float32).view(-1, 1)
+
+    return features_scaled, X_train, X_test, y_train, y_test
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available(
 ) else "mps" if torch.backends.mps.is_available() else "cpu")
